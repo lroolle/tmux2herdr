@@ -1,0 +1,16 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install dash and shellcheck
+        run: sudo apt-get update && sudo apt-get install -y dash shellcheck
+      - name: t/check.sh
+        run: t/check.sh

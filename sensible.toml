@@ -1,0 +1,87 @@
+# tmux2herdr -- the block install.sh merges into ~/.config/herdr/config.toml.
+# Every binding here exists because the tmux config in reference/tmux.conf
+# has it. Herdr defaults that already match tmux are not repeated.
+
+[ui]
+# Shape as well as colour, so state survives a colourblind eye or a screenshot.
+status_indicators = "symbols"
+agent_panel_sort = "priority"
+
+[keys]
+# tmux owns ctrl+s here, Claude Code owns ctrl+b (background tasks), zsh emacs
+# mode owns ctrl+b (backward-char), macOS input switching owns ctrl+space.
+# ctrl+h only shadows vim's insert-mode ^H alias; Backspace sends DEL and is
+# unaffected. Pick your own with `prefix = "..."` if ctrl+h is taken.
+prefix = "ctrl+h"
+
+# Herdr already matches tmux for: c new tab, v split right, h/j/k/l focus,
+# z zoom, x close pane, [ copy mode, 1..9 tab jump, n/p tab cycle,
+# shift+h/j/k/l swap pane, tab cycle pane. These are the rest.
+split_horizontal = ["prefix+b", "prefix+minus"]     # tmux: b splits below
+toggle_sidebar = "prefix+shift+b"                   # displaced by the above
+new_workspace = ["prefix+shift+n", "prefix+ctrl+c"] # tmux: C-c new-session
+next_workspace = "prefix+ctrl+n"                    # tmux: C-n switch-client -n
+previous_workspace = "prefix+ctrl+p"                # tmux: C-p switch-client -p
+goto = ["prefix+g", "prefix+ctrl+f"]                # tmux: C-f fzf picker
+resize_pane_up = "prefix+ctrl+k"                    # tmux: C-k resize-pane -U
+resize_pane_down = "prefix+ctrl+j"                  # tmux: C-j resize-pane -D
+last_pane = "prefix+semicolon"                      # tmux: ; last-pane
+detach = "prefix+d"                                 # tmux: d detach, frees q
+move_tab_previous = "prefix+shift+left"             # tmux: C-S-Left swap-window
+move_tab_next = "prefix+shift+right"                # tmux: C-S-Right swap-window
+
+# Herdr ships these actions unbound. They have no tmux equivalent because
+# tmux has no idea what an agent is.
+next_agent = "prefix+period"
+previous_agent = "prefix+comma"
+focus_agent = "prefix+alt+1..9"
+switch_workspace = "prefix+shift+1..9"
+
+# tmux: prefix + / opened copy mode already searching backwards. Herdr's copy
+# mode searches with / and ? but cannot start pre-armed, so this is fzf over
+# the scrollback instead: type to filter, Enter copies the line.
+[[keys.command]]
+key = "prefix+slash"
+type = "popup"
+command = "~/.config/herdr/bin/scrollback-search.sh"
+description = "search scrollback"
+width = "80%"
+height = "70%"
+
+# tmux: C-a last-window, C-s last-session. Herdr has last_pane only, so the
+# plugin records focus changes and these jump back.
+[[keys.command]]
+key = "prefix+ctrl+a"
+type = "shell"
+command = "~/.config/herdr/bin/last-target.sh back agent"
+description = "last agent"
+
+[[keys.command]]
+key = "prefix+ctrl+s"
+type = "shell"
+command = "~/.config/herdr/bin/last-target.sh back workspace"
+description = "last workspace"
+
+# Two lines per agent:
+#   <state icon> [CC] <dir>
+#   <what it says it is doing>
+# [CC] and $dir are reported by bin/agent-labels.sh. Herdr has no cwd token,
+# and style rules recolour a token without rewriting its text, so neither
+# value can come from config alone.
+[ui.sidebar.agents]
+rows = [
+  [
+    "state_icon",
+    { token = "agent", bold = true, rules = [
+      # Claude #d97757 is the official mark. Codex has no brand hue: its logo
+      # is monochrome (#111 light, white dark) plus a blue-violet gradient,
+      # so its mid stop is used, which survives a black background.
+      { equals = "[CC]", fg = "#d97757" },
+      { equals = "[CX]", fg = "#7a9dff" },
+      { equals = "[GM]", fg = "#4285f4" },
+      { equals = "[CU]", fg = "#87d75f" },
+    ] },
+    "$dir",
+  ],
+  [{ token = "terminal_title_stripped", dim = true }],
+]

@@ -1,0 +1,40 @@
+# Linking this is optional. The config in sensible.toml works without it;
+# the plugin is what makes the labels event-driven instead of polled, and
+# what feeds last-target.sh the focus changes it needs.
+id = "tmux2herdr.sensible"
+name = "tmux2herdr"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "tmux muscle memory and agent-identity rows for Herdr"
+platforms = ["linux", "macos"]
+
+# Herdr runs argv directly with no shell, so $HERDR_PLUGIN_ROOT is expanded
+# by an explicit sh -c rather than by Herdr.
+
+[[startup]]
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/agent-labels.sh\" -q"]
+
+# A pane becomes an agent, or a new pane appears: relabel. Both are low
+# volume. pane.output_changed is deliberately not hooked; Herdr excludes it
+# from plugin hooks precisely because it fires constantly.
+[[events]]
+on = "pane.agent_detected"
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/agent-labels.sh\" -q"]
+
+[[events]]
+on = "pane.created"
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/agent-labels.sh\" -q"]
+
+[[events]]
+on = "workspace.focused"
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/last-target.sh\" -q record workspace"]
+
+[[events]]
+on = "pane.focused"
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/last-target.sh\" -q record agent"]
+
+[[actions]]
+id = "relabel"
+title = "Relabel agent rows"
+contexts = ["workspace"]
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/agent-labels.sh\""]
