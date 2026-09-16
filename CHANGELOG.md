@@ -12,6 +12,7 @@ First release.
 - `bin/last-target.sh`: tmux's last-window and last-session, as last tab and
   last workspace, plus last agent which tmux had no concept of.
 - `prefix+C-l` clears the screen via `send-keys`; no action drops scrollback.
+- `prefix+C-u` opens copy mode: `copy_mode` accepts a list of keys.
 - No-prefix pane switching on `ctrl+alt+j/k` and `alt+j/k`, matching M-j/M-k.
 - `herdr-plugin.toml`: makes labelling event-driven and feeds focus history.
 - `install.sh`: merges between markers, refuses to clobber an existing

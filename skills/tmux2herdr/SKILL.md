@@ -64,8 +64,14 @@ you need `$HERDR_PLUGIN_ROOT` or `$HERDR_PLUGIN_STATE_DIR` expanded.
 
 ## Copy mode
 
-One configurable key, `copy_mode` (default `prefix+[`). The keys *inside*
-copy mode are fixed: `ctrl+u`/`ctrl+d` half page, `ctrl+b`/`ctrl+f` full,
+`copy_mode` accepts a **list**, so bind the paging key to it as well:
+`copy_mode = ["prefix+[", "prefix+ctrl+u"]`. Copy mode always opens at the
+bottom, so paging is still two keystrokes. `pageup`/`pagedown` are not
+bindable at all: the key parser knows only `left`, `right`, `up`, `down`,
+`enter`/`return`, `tab`, `esc`/`escape`, `space`, `backspace`/`bs`, function
+keys, and named punctuation (`minus`, `comma`, `period`, `slash`,
+`backslash`, `quote`, `semicolon`, `colon`, `percent`, `ampersand`,
+`backtick`, `plus`). The keys *inside* copy mode are fixed: `ctrl+u`/`ctrl+d` half page, `ctrl+b`/`ctrl+f` full,
 `PageUp`/`PageDown`, `/` and `?` search, `n`/`N` repeat, `v` select, `y`
 copy. There is no way to enter copy mode already scrolled or already
 searching, so tmux's `prefix+PageUp` and `prefix+/` cannot be reproduced
@@ -78,7 +84,9 @@ Scrolling a pane from outside is not available to a keybinding.
 
 ## Gaps with no workaround
 
-No named layouts, no `synchronize-panes`, no scrollback clear (sending
+No `select-layout` for live panes (`layout.apply` exists but builds a fresh
+tab and drops running processes; it is a template, not a re-tile), no
+`synchronize-panes`, no scrollback clear (sending
 `ctrl+l` clears the screen only), no `display-panes` overlay, no
 pane-border titles, no rectangle selection, no repeatable keys. Do not
 promise these; they are absent from the action table, not merely unbound.

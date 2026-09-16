@@ -26,6 +26,11 @@ goto = ["prefix+g", "prefix+ctrl+f"]                # tmux: C-f fzf picker
 resize_pane_up = "prefix+ctrl+k"                    # tmux: C-k resize-pane -U
 resize_pane_down = "prefix+ctrl+j"                  # tmux: C-j resize-pane -D
 last_pane = "prefix+semicolon"                      # tmux: ; last-pane
+# tmux reached the scrollback with prefix+PageUp. copy_mode takes a list, so
+# the paging key opens it too: prefix+ctrl+u, then ctrl+u pages. Herdr always
+# enters copy mode at the bottom, so this is two keystrokes where tmux was
+# one. "pageup" is not bindable at all; herdr's key parser has no name for it.
+copy_mode = ["prefix+[", "prefix+ctrl+u"]
 detach = "prefix+d"                                 # tmux: d detach, frees q
 move_tab_previous = "prefix+shift+left"             # tmux: C-S-Left swap-window
 move_tab_next = "prefix+shift+right"                # tmux: C-S-Right swap-window
@@ -83,13 +88,6 @@ key = "prefix+ctrl+l"
 type = "shell"
 command = "herdr pane send-keys \"$HERDR_ACTIVE_PANE_ID\" ctrl+l"
 description = "clear screen"
-
-# Paging has no binding here on purpose. Herdr's copy mode already takes
-# ctrl+u, ctrl+d, ctrl+b, ctrl+f, PageUp and PageDown, but nothing can enter
-# copy mode already scrolled the way tmux's prefix+PageUp did, and the keys
-# inside copy mode are not configurable. Enter with prefix+[ then page.
-# One upside of a ctrl+h prefix: ctrl+b stays free, so it still pages up
-# inside copy mode, which a ctrl+b prefix would have eaten.
 
 # Two lines per agent:
 #   <state icon> [CC] <dir>
