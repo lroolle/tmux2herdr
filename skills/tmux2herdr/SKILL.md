@@ -62,10 +62,25 @@ plugin hooks on purpose; it fires constantly.
 Plugin commands are argv, run with no shell. Use `["sh", "-c", "..."]` when
 you need `$HERDR_PLUGIN_ROOT` or `$HERDR_PLUGIN_STATE_DIR` expanded.
 
+## Copy mode
+
+One configurable key, `copy_mode` (default `prefix+[`). The keys *inside*
+copy mode are fixed: `ctrl+u`/`ctrl+d` half page, `ctrl+b`/`ctrl+f` full,
+`PageUp`/`PageDown`, `/` and `?` search, `n`/`N` repeat, `v` select, `y`
+copy. There is no way to enter copy mode already scrolled or already
+searching, so tmux's `prefix+PageUp` and `prefix+/` cannot be reproduced
+exactly. A `ctrl+b` prefix costs you `ctrl+b` page-up inside copy mode;
+another prefix does not.
+
+Scrolling a pane from outside is not available to a keybinding.
+`terminal.scroll` exists only as a stdin command of
+`herdr terminal session control`, which seizes exclusive control authority.
+
 ## Gaps with no workaround
 
-No named layouts, no `synchronize-panes`, no clear-scrollback, no
-`display-panes` overlay, no pane-border titles, no repeatable keys. Do not
+No named layouts, no `synchronize-panes`, no scrollback clear (sending
+`ctrl+l` clears the screen only), no `display-panes` overlay, no
+pane-border titles, no rectangle selection, no repeatable keys. Do not
 promise these; they are absent from the action table, not merely unbound.
 
 ## Writing scripts here

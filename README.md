@@ -63,9 +63,29 @@ tab, `v` split right, `h/j/k/l` focus, `z` zoom, `x` close, `[` copy mode,
 | `C-k` / `C-j` resize | `prefix+C-k` / `prefix+C-j` | binding |
 | `C-S-Left` / `Right` move window | `prefix+shift+left` / `right` | binding |
 | `;` last pane | `prefix+;` | binding |
+| `M-j` / `M-k` no-prefix pane switch | `ctrl+alt+j/k`, `alt+j/k` | binding |
 | `prefix+/` reverse search | `prefix+/` | fzf over scrollback |
-| `C-a` last window | `prefix+C-a` last agent | plugin focus history |
+| `C-a` last window | `prefix+C-a` | plugin focus history |
 | `C-s` last session | `prefix+C-s` last workspace | plugin focus history |
+| (none) last agent | `prefix+a` | plugin focus history |
+| `C-l` clear screen and history | `prefix+C-l` clears the screen | `send-keys ctrl+l` |
+
+## Paging the scrollback
+
+Herdr's copy mode already pages the way you expect. `prefix+[` enters it,
+then `ctrl+u` and `ctrl+d` move half a screen, `ctrl+b` and `ctrl+f` a full
+one, and `PageUp` and `PageDown` work too.
+
+What is missing is tmux's `prefix+PageUp`, which entered copy mode *already*
+scrolled up by a page. Herdr has one binding for copy mode and no way to
+pre-arm it, and the keys inside copy mode are not configurable. So paging is
+two keystrokes here: `prefix+[` then `ctrl+u`.
+
+A `ctrl+h` prefix pays off here. Herdr warns that a `ctrl+b` prefix swallows
+`ctrl+b` inside copy mode, costing you page-up. Ours leaves it free.
+
+When you are hunting for something rather than reading, `prefix+/` is the
+faster tool: it filters the whole scrollback instead of walking it.
 
 ## What tmux still does better
 
@@ -74,7 +94,10 @@ Honest list. These have no Herdr action at all, so no config can reach them.
 - Named layouts. `main-vertical`, `main-horizontal`, `tiled` and
   `main-pane-width` have no equivalent. You split and drag borders.
 - `synchronize-panes`. There is no broadcast-to-all-panes input mode.
-- `clear-history`. No action clears a pane's scrollback.
+- `clear-history`. `prefix+C-l` clears the visible screen by sending
+  `ctrl+l` to the shell, but nothing drops the scrollback itself.
+- Rectangle selection. Copy mode selects by line; `C-v` has no equivalent.
+- Entering copy mode pre-scrolled or pre-searching. See above.
 - `display-panes`. No numbered overlay to jump straight to a pane.
 - `pane-border-format`. Borders are on, auto, or off, with no title.
 - Repeatable keys. `repeat-time` has no equivalent; Herdr uses modes, so
@@ -149,7 +172,7 @@ tmux set -g pane-colours[0] "#586e75"
     herdr-plugin.toml    event hooks, optional
     bin/agent-labels.sh  report [CC] and $dir per pane
     bin/scrollback-search.sh  fzf reverse search in a popup
-    bin/last-target.sh   last agent, last workspace
+    bin/last-target.sh   last tab, last workspace, last agent
     reference/tmux.conf  the source config
     skills/tmux2herdr/   for coding agents reading this repo
 

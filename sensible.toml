@@ -37,6 +37,12 @@ previous_agent = "prefix+comma"
 focus_agent = "prefix+alt+1..9"
 switch_workspace = "prefix+shift+1..9"
 
+# tmux: M-j / M-k switched panes with no prefix. ctrl+alt is the one modifier
+# family terminals and desktops leave alone; plain alt also works if your
+# terminal sends it as a modifier (Alacritty: option_as_alt).
+focus_pane_down = ["prefix+j", "ctrl+alt+j", "alt+j"]
+focus_pane_up = ["prefix+k", "ctrl+alt+k", "alt+k"]
+
 # tmux: prefix + / opened copy mode already searching backwards. Herdr's copy
 # mode searches with / and ? but cannot start pre-armed, so this is fzf over
 # the scrollback instead: type to filter, Enter copies the line.
@@ -53,6 +59,13 @@ height = "70%"
 [[keys.command]]
 key = "prefix+ctrl+a"
 type = "shell"
+command = "~/.config/herdr/bin/last-target.sh back tab"
+description = "last tab"
+
+# No tmux equivalent: tmux has no idea which pane is an agent.
+[[keys.command]]
+key = "prefix+a"
+type = "shell"
 command = "~/.config/herdr/bin/last-target.sh back agent"
 description = "last agent"
 
@@ -61,6 +74,22 @@ key = "prefix+ctrl+s"
 type = "shell"
 command = "~/.config/herdr/bin/last-target.sh back workspace"
 description = "last workspace"
+
+# tmux: prefix + C-l cleared the screen and the history. Herdr has no
+# clear-scrollback action, so this sends ctrl+l to the shell instead: the
+# screen clears, the scrollback does not.
+[[keys.command]]
+key = "prefix+ctrl+l"
+type = "shell"
+command = "herdr pane send-keys \"$HERDR_ACTIVE_PANE_ID\" ctrl+l"
+description = "clear screen"
+
+# Paging has no binding here on purpose. Herdr's copy mode already takes
+# ctrl+u, ctrl+d, ctrl+b, ctrl+f, PageUp and PageDown, but nothing can enter
+# copy mode already scrolled the way tmux's prefix+PageUp did, and the keys
+# inside copy mode are not configurable. Enter with prefix+[ then page.
+# One upside of a ctrl+h prefix: ctrl+b stays free, so it still pages up
+# inside copy mode, which a ctrl+b prefix would have eaten.
 
 # Two lines per agent:
 #   <state icon> [CC] <dir>

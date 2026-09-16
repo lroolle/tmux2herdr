@@ -22,15 +22,16 @@ usage() {
 $prog - tmux's last-window and last-session, for Herdr
 
 tmux had "prefix + C-a" for the last window and "prefix + C-s" for the last
-session. Herdr has last_pane and nothing else, so this keeps the previous
-focused workspace and agent in a state file and jumps back to them.
+session. Herdr has last_pane and nothing else, so this keeps the previously
+focused tab, workspace and agent in a state file and jumps back to them.
 
-"record" is driven by the plugin's workspace.focused and pane.focused hooks.
+"record" is driven by the plugin's workspace.focused, tab.focused and
+pane.focused hooks.
 Without the plugin linked, nothing records and "back" has nothing to do.
 
 USAGE:
-  $prog record workspace|agent
-  $prog back   workspace|agent
+  $prog record workspace|tab|agent
+  $prog back   workspace|tab|agent
   $prog show
 
 OPTIONS:
@@ -43,7 +44,7 @@ ENV:
   HERDR_BIN_PATH          Herdr binary (default: herdr on PATH)
 
 EXAMPLES:
-  $prog back workspace
+  $prog back tab
   $prog show
 USAGE
 }
@@ -61,6 +62,8 @@ current_of() {
   case $1 in
     workspace) "$HERDR" workspace list 2>/dev/null \
         | jq -r '.result.workspaces[]? | select(.focused) | .workspace_id' ;;
+    tab) "$HERDR" tab list 2>/dev/null \
+        | jq -r '.result.tabs[]? | select(.focused) | .tab_id' ;;
     agent) "$HERDR" agent list 2>/dev/null \
         | jq -r '.result.agents[]? | select(.focused) | .pane_id' ;;
     *) die "unknown kind: $1" ;;
@@ -93,6 +96,8 @@ do_back() {
   case $kind in
     workspace) "$HERDR" workspace focus "$target" >/dev/null \
         || die "cannot focus workspace $target" ;;
+    tab) "$HERDR" tab focus "$target" >/dev/null \
+        || die "cannot focus tab $target" ;;
     agent) "$HERDR" agent focus "$target" >/dev/null \
         || die "cannot focus agent $target" ;;
   esac
@@ -100,7 +105,7 @@ do_back() {
 }
 
 do_show() {
-  for kind in workspace agent; do
+  for kind in workspace tab agent; do
     cur=""; prev=""
     [ ! -f "$STATE_DIR/$kind.current" ] || cur=$(cat "$STATE_DIR/$kind.current")
     [ ! -f "$STATE_DIR/$kind.previous" ] || prev=$(cat "$STATE_DIR/$kind.previous")
@@ -128,9 +133,9 @@ main() {
   shift
   case $cmd in
     record|back)
-      [ $# -gt 0 ] || die "$cmd needs: workspace or agent"
+      [ $# -gt 0 ] || die "$cmd needs: workspace, tab or agent"
       case $1 in
-        workspace|agent) : ;;
+        workspace|tab|agent) : ;;
         *) die "unknown kind: $1" ;;
       esac
       if [ "$cmd" = record ]; then do_record "$1"; else do_back "$1"; fi

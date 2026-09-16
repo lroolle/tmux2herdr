@@ -30,6 +30,10 @@ on = "workspace.focused"
 command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/last-target.sh\" -q record workspace"]
 
 [[events]]
+on = "tab.focused"
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/last-target.sh\" -q record tab"]
+
+[[events]]
 on = "pane.focused"
 command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/bin/last-target.sh\" -q record agent"]
 
